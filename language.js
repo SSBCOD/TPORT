@@ -14,6 +14,9 @@
       languageLabel: "Тіл таңдау",
       marquee: "Тұрсын / SMM дизайнер / Верстка дизайнері / Графикалық дизайнер /",
       sampleWork: "Жұмыстар",
+      toolsKicker: "Инструменттер",
+      toolsTitle: "Мен жұмыс істейтін қолданбалар",
+      toolsHint: "Төмен айналдыр — иконкалар орбитаға жиналады",
       openCase: "Кейсті ашу",
       aboutButton: "Мен туралы",
       aboutButtonSmall: "Жеке файл",
@@ -56,6 +59,9 @@
       languageLabel: "Выбор языка",
       marquee: "Тұрсын / SMM дизайнер / Дизайнер-верстальщик / Графический дизайнер /",
       sampleWork: "Работы",
+      toolsKicker: "Инструменты",
+      toolsTitle: "Приложения, с которыми я работаю",
+      toolsHint: "Крути вниз — иконки соберутся в орбиту",
       openCase: "Открыть кейс",
       aboutButton: "Обо мне",
       aboutButtonSmall: "Личный файл",
@@ -98,6 +104,9 @@
       languageLabel: "Language switcher",
       marquee: "Tursyn / SMM designer / Layout designer / Graphic designer /",
       sampleWork: "Work",
+      toolsKicker: "Tools",
+      toolsTitle: "Apps I work with",
+      toolsHint: "Scroll down — the icons gather into orbit",
       openCase: "Open case",
       aboutButton: "About me",
       aboutButtonSmall: "Personal file",
@@ -424,6 +433,10 @@
 
     document.querySelectorAll("[data-language-switcher]").forEach((switcher) => {
       switcher.setAttribute("aria-label", strings.languageLabel);
+    });
+
+    document.querySelectorAll("[data-i18n]").forEach((element) => {
+      element.textContent = strings[element.dataset.i18n] || element.textContent;
     });
 
     if (!document.body.classList.contains("case-page")) {
