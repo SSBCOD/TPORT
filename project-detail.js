@@ -3,17 +3,70 @@ const params = new URLSearchParams(window.location.search);
 const requestedSlug = params.get("case");
 const selectedIndex = Math.max(0, caseProjects.findIndex((item) => item.slug === requestedSlug));
 const project = caseProjects[selectedIndex] || caseProjects[0];
+const i18n = () => window.TPORT_I18N;
+
+function t(key) {
+  return i18n()?.t(key) || key;
+}
+
+function localize(item) {
+  return item ? i18n()?.localizeProject(item) || item : item;
+}
 
 function setText(id, value) {
   const element = document.getElementById(id);
   if (element) element.textContent = value || "";
 }
 
+function setSelectorText(selector, value) {
+  const element = document.querySelector(selector);
+  if (element) element.textContent = value || "";
+}
+
 function setProjectLink(id, item, label) {
   const element = document.getElementById(id);
-  if (!element || !item) return;
+  const localizedItem = localize(item);
+  if (!element || !localizedItem) return;
+
+  const labelElement = document.createElement("span");
+  labelElement.textContent = label;
+
+  const titleElement = document.createElement("strong");
+  titleElement.textContent = localizedItem.title;
+
   element.href = `project.html?case=${item.slug}`;
-  element.innerHTML = `<span>${label}</span><strong>${item.title}</strong>`;
+  element.replaceChildren(labelElement, titleElement);
+}
+
+function setStaticLabels() {
+  const backLink = document.querySelector(".case-back");
+  if (backLink) backLink.textContent = t("caseBack");
+
+  const metaLabels = document.querySelectorAll(".case-meta-grid article span");
+  [t("roleLabel"), t("yearLabel"), t("categoryLabel")].forEach((label, index) => {
+    if (metaLabels[index]) metaLabels[index].textContent = label;
+  });
+
+  setSelectorText(".case-gallery-heading span", t("visualArchive"));
+  setSelectorText(".case-gallery-heading h2", t("selectedDesigns"));
+  setSelectorText(".case-board-note span", t("caseNote"));
+
+  const storyTitles = document.querySelectorAll(".case-story h2");
+  [t("brief"), t("idea"), t("result")].forEach((label, index) => {
+    if (storyTitles[index]) storyTitles[index].textContent = label;
+  });
+
+  const metaSection = document.querySelector(".case-meta-grid");
+  if (metaSection) metaSection.setAttribute("aria-label", t("projectDetails"));
+
+  const gallerySection = document.querySelector(".case-gallery");
+  if (gallerySection) gallerySection.setAttribute("aria-label", t("projectVisuals"));
+
+  const boardSection = document.querySelector(".case-board");
+  if (boardSection) boardSection.setAttribute("aria-label", t("visualDirection"));
+
+  const nextSection = document.querySelector(".case-next");
+  if (nextSection) nextSection.setAttribute("aria-label", t("otherProjects"));
 }
 
 function renderProject() {
@@ -22,32 +75,45 @@ function renderProject() {
     return;
   }
 
-  document.title = `${project.title} | Тұрсын Files`;
+  const localizedProject = localize(project);
+  const title = localizedProject.title;
+  const cover = project.image || project.images?.[0] || "";
 
-  setText("caseEyebrow", `${String(selectedIndex + 1).padStart(2, "0")} / ${project.category}`);
-  setText("caseTitle", project.title);
-  setText("caseIntro", project.intro);
-  setText("caseRole", project.role);
-  setText("caseYear", project.year);
-  setText("caseCategory", project.category);
-  setText("caseBrief", project.brief);
-  setText("caseIdea", project.idea);
-  setText("caseResult", project.result);
-  setText("caseBoardTitle", project.title);
+  setStaticLabels();
+  document.title = `${title} | ${t("title")}`;
+
+  const metaDescription = document.querySelector('meta[name="description"]');
+  if (metaDescription) metaDescription.content = localizedProject.intro || t("description");
+
+  setText("caseEyebrow", `${String(selectedIndex + 1).padStart(2, "0")} / ${localizedProject.category}`);
+  setText("caseTitle", title);
+  setText("caseIntro", localizedProject.intro);
+  setText("caseRole", localizedProject.role);
+  setText("caseYear", localizedProject.year);
+  setText("caseCategory", localizedProject.category);
+  setText("caseBrief", localizedProject.brief);
+  setText("caseIdea", localizedProject.idea);
+  setText("caseResult", localizedProject.result);
+  setText("caseBoardTitle", title);
 
   const image = document.getElementById("caseImage");
   const imageFrame = document.getElementById("caseImageFrame");
   const placeholder = document.getElementById("caseImagePlaceholder");
-  const cover = project.image || project.images?.[0] || "";
 
   if (image && imageFrame && placeholder) {
+    imageFrame.classList.remove("is-missing");
+    image.style.display = "";
     image.src = cover;
-    image.alt = project.title;
-    placeholder.textContent = project.title;
-    image.addEventListener("error", () => {
+    image.alt = title;
+    placeholder.textContent = title;
+    image.onerror = () => {
       imageFrame.classList.add("is-missing");
-      image.remove();
-    });
+      image.style.display = "none";
+    };
+    image.onload = () => {
+      imageFrame.classList.remove("is-missing");
+      image.style.display = "";
+    };
   }
 
   const tags = document.getElementById("caseTags");
@@ -72,11 +138,11 @@ function renderProject() {
 
         const itemImage = document.createElement("img");
         itemImage.src = src;
-        itemImage.alt = `${project.title} design ${index + 1}`;
+        itemImage.alt = `${title} ${t("designCaption")} ${index + 1}`;
         itemImage.loading = index > 1 ? "lazy" : "eager";
 
         const caption = document.createElement("figcaption");
-        caption.textContent = `${String(index + 1).padStart(2, "0")} / ${project.title}`;
+        caption.textContent = `${String(index + 1).padStart(2, "0")} / ${title}`;
 
         figure.append(itemImage, caption);
         return figure;
@@ -86,8 +152,9 @@ function renderProject() {
 
   const previous = caseProjects[(selectedIndex - 1 + caseProjects.length) % caseProjects.length];
   const next = caseProjects[(selectedIndex + 1) % caseProjects.length];
-  setProjectLink("prevProject", previous, "Previous");
-  setProjectLink("nextProject", next, "Next");
+  setProjectLink("prevProject", previous, t("previous"));
+  setProjectLink("nextProject", next, t("next"));
 }
 
 renderProject();
+window.addEventListener("tport:languagechange", renderProject);

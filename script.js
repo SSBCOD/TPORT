@@ -5,6 +5,7 @@ if (hasGsap) {
 }
 
 const projects = window.portfolioProjects || [];
+const i18n = () => window.TPORT_I18N;
 
 const tapeColors = ["#e64b42", "#ffd84d", "#171717", "#3e82ff", "#8b66d9"];
 const tilts = [-3.5, 2.4, -1.8, 3.7, -2.7, 1.4, -3.1, 2.9, -0.9, 3.2, -2.2, 1.9, -3.8];
@@ -32,11 +33,13 @@ if (profileImage) {
 }
 
 function createProjectCard(project, index) {
+  const localizedProject = i18n()?.localizeProject(project) || project;
+  const openCase = i18n()?.t("openCase") || "Open case";
   const cover = project.image || project.images?.[0] || "";
   const card = document.createElement("a");
   card.className = "project-card";
   card.href = `project.html?case=${project.slug}`;
-  card.setAttribute("aria-label", `Открыть проект ${project.title}`);
+  card.setAttribute("aria-label", `${openCase}: ${localizedProject.title}`);
   card.style.setProperty("--tilt", `${tilts[index % tilts.length]}deg`);
   card.style.setProperty("--tape", tapeColors[index % tapeColors.length]);
   card.style.setProperty("--tape-tilt", `${tapeTilts[index % tapeTilts.length]}deg`);
@@ -49,7 +52,7 @@ function createProjectCard(project, index) {
 
   const image = document.createElement("img");
   image.src = cover;
-  image.alt = project.title;
+  image.alt = localizedProject.title;
   image.loading = "lazy";
   image.addEventListener("error", () => {
     visual.classList.add("is-missing");
@@ -57,35 +60,37 @@ function createProjectCard(project, index) {
 
   const placeholder = document.createElement("div");
   placeholder.className = "placeholder";
-  placeholder.textContent = project.title;
+  placeholder.textContent = localizedProject.title;
 
   visual.append(image, placeholder);
   paper.appendChild(visual);
 
   const title = document.createElement("h2");
   title.className = "project-title";
-  title.textContent = project.title;
+  title.textContent = localizedProject.title;
 
   const category = document.createElement("p");
   category.className = "project-category";
-  category.textContent = project.category;
+  category.textContent = localizedProject.category;
 
   const cue = document.createElement("span");
   cue.className = "project-open-cue";
-  cue.textContent = "Open case";
+  cue.textContent = openCase;
 
   card.append(paper, title, category, cue);
   return card;
 }
 
 function createAboutCard() {
+  const aboutLabel = i18n()?.t("aboutButton") || "About me";
+  const aboutSmall = i18n()?.t("aboutButtonSmall") || "Personal file";
   const card = document.createElement("div");
   card.className = "about-card";
 
   const button = document.createElement("button");
   button.className = "about-button";
   button.type = "button";
-  button.innerHTML = "<span>About me</span><small>Let's get personal</small>";
+  button.innerHTML = `<span>${aboutLabel}</span><small>${aboutSmall}</small>`;
   button.addEventListener("click", () => {
     document.querySelector("#about").scrollIntoView({ behavior: "smooth", block: "start" });
   });
@@ -102,7 +107,7 @@ function renderProjects() {
   });
 
   fragment.appendChild(createAboutCard());
-  track.appendChild(fragment);
+  track.replaceChildren(fragment);
 }
 
 function setupIntroReveal() {
@@ -153,6 +158,8 @@ function setupHorizontalRail() {
 }
 
 function setupDraggableCards() {
+  if (window.matchMedia("(max-width: 640px)").matches) return;
+
   const cards = [...document.querySelectorAll("[data-drag-card]")];
   let topLayer = 20;
 
@@ -217,6 +224,14 @@ setupHorizontalRail();
 setupDraggableCards();
 
 window.addEventListener("load", () => {
+  if (hasGsap) {
+    ScrollTrigger.refresh();
+  }
+});
+
+window.addEventListener("tport:languagechange", () => {
+  renderProjects();
+
   if (hasGsap) {
     ScrollTrigger.refresh();
   }

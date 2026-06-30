@@ -16,7 +16,14 @@
   <body class="case-page">
     <header class="case-header">
       <a class="case-back" href="index.html#work">Back to works</a>
-      <a class="case-logo" href="index.html">ТҰРСЫН FILES</a>
+      <div class="case-header-actions">
+        <div class="language-switcher language-switcher--case" data-language-switcher aria-label="Выбор языка">
+          <button type="button" data-lang-option="kk">ҚАЗ</button>
+          <button type="button" data-lang-option="ru">РУС</button>
+          <button type="button" data-lang-option="en">ENG</button>
+        </div>
+        <a class="case-logo" href="index.html">ТҰРСЫН FILES</a>
+      </div>
     </header>
 
     <main id="caseRoot" class="case-root" aria-live="polite">
@@ -91,6 +98,7 @@
     </main>
 
     <script src="project-data-drive.js"></script>
+    <script src="language.js"></script>
     <script src="project-detail.js"></script>
   </body>
 </html>
