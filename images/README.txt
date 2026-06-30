@@ -1,6 +1,6 @@
 Положите изображения в эту папку с такими именами:
 
-avatar.png - фото/аватар для экрана внутри Macintosh.
+tursyn-night.png - фото/аватар для экрана внутри Macintosh.
 
 p1.jpg  - Unicef
 p2.jpg  - Samruk Kazyna Store
