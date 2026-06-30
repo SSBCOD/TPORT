@@ -4,22 +4,7 @@ if (hasGsap) {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-// Контент проектов: здесь удобно менять названия, категории и пути картинок.
-const projects = [
-  { title: "Unicef", category: "SMM Design", image: "images/p1.jpg" },
-  { title: "Samruk Kazyna Store", category: "Графический дизайн", image: "images/p2.jpg" },
-  { title: "Kazakhtelecom", category: "SMM Design", image: "images/p3.jpg" },
-  { title: "ALT University", category: "Брендинг", image: "images/p4.jpg" },
-  { title: "Asia Park", category: "SMM Design", image: "images/p5.jpg" },
-  { title: "Riviera International School", category: "Брендинг", image: "images/p6.jpg" },
-  { title: "High School of Burabay", category: "Графический дизайн", image: "images/p7.jpg" },
-  { title: "Благотворительный фонд +1", category: "SMM Design", image: "images/p8.jpg" },
-  { title: "Astana Hub Ventures", category: "Брендинг", image: "images/p9.jpg" },
-  { title: "Paluan Fitness", category: "SMM Design", image: "images/p10.jpg" },
-  { title: "Dem Group", category: "Графический дизайн", image: "images/p11.jpg" },
-  { title: "Astana Venture Club", category: "SMM Design", image: "images/p12.jpg" },
-  { title: "Kazakhstan Para Taekwondo", category: "Графический дизайн", image: "images/p13.jpg" },
-];
+const projects = window.portfolioProjects || [];
 
 const tapeColors = ["#e64b42", "#ffd84d", "#171717", "#3e82ff", "#8b66d9"];
 const tilts = [-3.5, 2.4, -1.8, 3.7, -2.7, 1.4, -3.1, 2.9, -0.9, 3.2, -2.2, 1.9, -3.8];
@@ -47,8 +32,10 @@ if (profileImage) {
 }
 
 function createProjectCard(project, index) {
-  const card = document.createElement("article");
+  const card = document.createElement("a");
   card.className = "project-card";
+  card.href = `project.html?case=${project.slug}`;
+  card.setAttribute("aria-label", `Открыть проект ${project.title}`);
   card.style.setProperty("--tilt", `${tilts[index % tilts.length]}deg`);
   card.style.setProperty("--tape", tapeColors[index % tapeColors.length]);
   card.style.setProperty("--tape-tilt", `${tapeTilts[index % tapeTilts.length]}deg`);
@@ -82,7 +69,11 @@ function createProjectCard(project, index) {
   category.className = "project-category";
   category.textContent = project.category;
 
-  card.append(paper, title, category);
+  const cue = document.createElement("span");
+  cue.className = "project-open-cue";
+  cue.textContent = "Open case";
+
+  card.append(paper, title, category, cue);
   return card;
 }
 

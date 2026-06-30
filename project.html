@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Project | Тұрсын Files</title>
+    <meta name="description" content="Страница проекта из портфолио Тұрсын." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="case-page">
+    <header class="case-header">
+      <a class="case-back" href="index.html#work">Back to works</a>
+      <a class="case-logo" href="index.html">ТҰРСЫН FILES</a>
+    </header>
+
+    <main id="caseRoot" class="case-root" aria-live="polite">
+      <section class="case-hero">
+        <div class="case-hero-copy">
+          <p class="case-eyebrow" id="caseEyebrow">Case file</p>
+          <h1 id="caseTitle">Project</h1>
+          <p class="case-intro" id="caseIntro"></p>
+        </div>
+
+        <div class="case-hero-panel">
+          <div class="case-image-frame" id="caseImageFrame">
+            <img id="caseImage" src="" alt="" />
+            <div class="case-image-placeholder" id="caseImagePlaceholder"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="case-meta-grid" aria-label="Project details">
+        <article>
+          <span>Role</span>
+          <strong id="caseRole"></strong>
+        </article>
+        <article>
+          <span>Year</span>
+          <strong id="caseYear"></strong>
+        </article>
+        <article>
+          <span>Category</span>
+          <strong id="caseCategory"></strong>
+        </article>
+      </section>
+
+      <section class="case-story">
+        <article>
+          <span>01</span>
+          <h2>Brief</h2>
+          <p id="caseBrief"></p>
+        </article>
+        <article>
+          <span>02</span>
+          <h2>Idea</h2>
+          <p id="caseIdea"></p>
+        </article>
+        <article>
+          <span>03</span>
+          <h2>Result</h2>
+          <p id="caseResult"></p>
+        </article>
+      </section>
+
+      <section class="case-board" aria-label="Visual direction">
+        <div class="case-board-note">
+          <span>Case note</span>
+          <strong id="caseBoardTitle"></strong>
+        </div>
+        <div class="case-tags" id="caseTags"></div>
+      </section>
+
+      <nav class="case-next" aria-label="Other projects">
+        <a id="prevProject" href="#">Previous</a>
+        <a id="nextProject" href="#">Next</a>
+      </nav>
+    </main>
+
+    <script src="project-data.js"></script>
+    <script src="project-detail.js"></script>
+  </body>
+</html>
