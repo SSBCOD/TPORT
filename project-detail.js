@@ -38,9 +38,10 @@ function renderProject() {
   const image = document.getElementById("caseImage");
   const imageFrame = document.getElementById("caseImageFrame");
   const placeholder = document.getElementById("caseImagePlaceholder");
+  const cover = project.image || project.images?.[0] || "";
 
   if (image && imageFrame && placeholder) {
-    image.src = project.image;
+    image.src = cover;
     image.alt = project.title;
     placeholder.textContent = project.title;
     image.addEventListener("error", () => {
@@ -56,6 +57,29 @@ function renderProject() {
         const item = document.createElement("span");
         item.textContent = tag;
         return item;
+      })
+    );
+  }
+
+  const gallery = document.getElementById("caseGallery");
+  if (gallery) {
+    gallery.replaceChildren(
+      ...(project.images || []).map((src, index) => {
+        const figure = document.createElement("figure");
+        figure.className = "case-gallery-card";
+        figure.style.setProperty("--float-delay", `${index * -1.6}s`);
+        figure.style.setProperty("--float-distance", `${10 + (index % 3) * 6}px`);
+
+        const itemImage = document.createElement("img");
+        itemImage.src = src;
+        itemImage.alt = `${project.title} design ${index + 1}`;
+        itemImage.loading = index > 1 ? "lazy" : "eager";
+
+        const caption = document.createElement("figcaption");
+        caption.textContent = `${String(index + 1).padStart(2, "0")} / ${project.title}`;
+
+        figure.append(itemImage, caption);
+        return figure;
       })
     );
   }

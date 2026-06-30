@@ -32,6 +32,7 @@ if (profileImage) {
 }
 
 function createProjectCard(project, index) {
+  const cover = project.image || project.images?.[0] || "";
   const card = document.createElement("a");
   card.className = "project-card";
   card.href = `project.html?case=${project.slug}`;
@@ -47,7 +48,7 @@ function createProjectCard(project, index) {
   visual.className = "project-visual";
 
   const image = document.createElement("img");
-  image.src = project.image;
+  image.src = cover;
   image.alt = project.title;
   image.loading = "lazy";
   image.addEventListener("error", () => {
