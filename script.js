@@ -302,6 +302,83 @@ function setupDraggableCards() {
     const edgeBleed = Math.min(46, boardWidth * 0.12);
     return Math.max(0, (boardWidth - card.offsetWidth) / 2 + edgeBleed);
   };
+  const getTouchPoint = (event) => {
+    const touch = event.touches?.[0] || event.changedTouches?.[0];
+    return touch ? { clientX: touch.clientX, clientY: touch.clientY } : null;
+  };
+  let activeDragCard = null;
+
+  const beginDrag = (card, point, event) => {
+    if (activeDragCard || event.target.closest("a")) return;
+    if (event.cancelable) event.preventDefault();
+
+    const originX = Number(card.dataset.currentX || 0);
+    const originY = Number(card.dataset.currentY || 0);
+    const originRotate = Number(card.dataset.rotate || 0);
+    const startPointerX = point.clientX;
+    const startPointerY = point.clientY;
+
+    activeDragCard = card;
+    card.classList.add("is-dragging");
+    card.style.zIndex = String(topLayer++);
+
+    if (event.pointerId != null && card.setPointerCapture) {
+      try {
+        card.setPointerCapture(event.pointerId);
+      } catch {
+        // Some mobile browsers expose pointer capture but reject it during fast taps.
+      }
+    }
+
+    const moveTo = (clientX, clientY) => {
+      const nextX = originX + clientX - startPointerX;
+      const nextY = originY + clientY - startPointerY;
+      card.dataset.currentX = nextX;
+      card.dataset.currentY = nextY;
+      moveCard(card, nextX, nextY, originRotate);
+    };
+
+    const onPointerMove = (moveEvent) => {
+      if (moveEvent.cancelable) moveEvent.preventDefault();
+      moveTo(moveEvent.clientX, moveEvent.clientY);
+    };
+
+    const onTouchMove = (moveEvent) => {
+      const touchPoint = getTouchPoint(moveEvent);
+      if (!touchPoint) return;
+      if (moveEvent.cancelable) moveEvent.preventDefault();
+      moveTo(touchPoint.clientX, touchPoint.clientY);
+    };
+
+    const finishDrag = (finishEvent) => {
+      card.classList.remove("is-dragging");
+      activeDragCard = null;
+
+      if (event.pointerId != null && card.releasePointerCapture) {
+        try {
+          card.releasePointerCapture(event.pointerId);
+        } catch {
+          // Pointer capture can already be released by the browser.
+        }
+      }
+
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("pointerup", finishDrag);
+      window.removeEventListener("pointercancel", finishDrag);
+      window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("touchend", finishDrag);
+      window.removeEventListener("touchcancel", finishDrag);
+
+      if (finishEvent?.cancelable) finishEvent.preventDefault();
+    };
+
+    window.addEventListener("pointermove", onPointerMove, { passive: false });
+    window.addEventListener("pointerup", finishDrag);
+    window.addEventListener("pointercancel", finishDrag);
+    window.addEventListener("touchmove", onTouchMove, { passive: false });
+    window.addEventListener("touchend", finishDrag);
+    window.addEventListener("touchcancel", finishDrag);
+  };
 
   cards.forEach((card) => {
     const baseX = Number(card.dataset.x || 0);
@@ -320,38 +397,16 @@ function setupDraggableCards() {
     moveCard(card, startX, startY, rotate);
 
     card.addEventListener("pointerdown", (event) => {
-      if (event.target.closest("a")) return;
-      event.preventDefault();
-
-      const originX = Number(card.dataset.currentX || 0);
-      const originY = Number(card.dataset.currentY || 0);
-      const originRotate = Number(card.dataset.rotate || 0);
-      const startPointerX = event.clientX;
-      const startPointerY = event.clientY;
-
-      card.classList.add("is-dragging");
-      card.style.zIndex = String(topLayer++);
-      card.setPointerCapture(event.pointerId);
-
-      const onPointerMove = (moveEvent) => {
-        const nextX = originX + moveEvent.clientX - startPointerX;
-        const nextY = originY + moveEvent.clientY - startPointerY;
-        card.dataset.currentX = nextX;
-        card.dataset.currentY = nextY;
-        moveCard(card, nextX, nextY, originRotate);
-      };
-
-      const onPointerUp = () => {
-        card.classList.remove("is-dragging");
-        card.removeEventListener("pointermove", onPointerMove);
-        card.removeEventListener("pointerup", onPointerUp);
-        card.removeEventListener("pointercancel", onPointerUp);
-      };
-
-      card.addEventListener("pointermove", onPointerMove);
-      card.addEventListener("pointerup", onPointerUp);
-      card.addEventListener("pointercancel", onPointerUp);
+      beginDrag(card, event, event);
     });
+    card.addEventListener(
+      "touchstart",
+      (event) => {
+        const touchPoint = getTouchPoint(event);
+        if (touchPoint) beginDrag(card, touchPoint, event);
+      },
+      { passive: false }
+    );
   });
 }
 
