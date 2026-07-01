@@ -219,8 +219,9 @@ function setupToolsOrbit() {
     const width = window.innerWidth;
     const height = window.innerHeight;
     const isMobile = width <= 640;
-    const rx = isMobile ? Math.min(width * 0.34, 145) : Math.min(width * 0.36, 470);
-    const ry = isMobile ? Math.min(height * 0.27, 230) : Math.min(height * 0.25, 245);
+    const mobileRadius = Math.min(width * 0.36, height * 0.22, 142);
+    const rx = isMobile ? mobileRadius : Math.min(width * 0.36, 470);
+    const ry = isMobile ? mobileRadius : Math.min(height * 0.25, 245);
     const assemble = easeOut(progress / 0.42);
     const spinProgress = clamp((progress - 0.25) / 0.75);
     const spin = spinProgress * Math.PI * 2 * 1.35;
@@ -275,19 +276,42 @@ function setupToolsOrbit() {
 }
 
 function setupDraggableCards() {
-  if (window.matchMedia("(max-width: 640px)").matches) return;
-
   const cards = [...document.querySelectorAll("[data-drag-card]")];
   let topLayer = 20;
 
-  const layoutScale = () => Math.min(1, Math.max(0.42, (window.innerWidth - 80) / 1180));
+  const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+  const isMobileLayout = () => window.matchMedia("(max-width: 640px)").matches;
+  const layoutScale = () => {
+    if (isMobileLayout()) {
+      return Math.min(0.34, Math.max(0.24, (window.innerWidth - 48) / 1180));
+    }
+
+    return Math.min(1, Math.max(0.42, (window.innerWidth - 80) / 1180));
+  };
+
+  const verticalScale = () => {
+    if (isMobileLayout()) {
+      return Math.min(0.82, Math.max(0.62, window.innerHeight / 980));
+    }
+
+    return Math.min(1, Math.max(0.72, window.innerHeight / 900));
+  };
+
+  const mobileXLimit = (card) => {
+    const boardWidth = card.parentElement?.clientWidth || window.innerWidth;
+    const edgeBleed = Math.min(46, boardWidth * 0.12);
+    return Math.max(0, (boardWidth - card.offsetWidth) / 2 + edgeBleed);
+  };
 
   cards.forEach((card) => {
     const baseX = Number(card.dataset.x || 0);
     const baseY = Number(card.dataset.y || 0);
     const rotate = Number(card.dataset.r || 0);
-    const startX = Math.round(baseX * layoutScale());
-    const startY = Math.round(baseY * Math.min(1, Math.max(0.72, window.innerHeight / 900)));
+    const scaledX = baseX * layoutScale();
+    const startX = Math.round(
+      isMobileLayout() ? clamp(scaledX, -mobileXLimit(card), mobileXLimit(card)) : scaledX
+    );
+    const startY = Math.round(baseY * verticalScale());
 
     card.dataset.currentX = startX;
     card.dataset.currentY = startY;

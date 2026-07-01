@@ -771,10 +771,11 @@ html[lang="ru"] .tools-core h2 {
   z-index: 4;
   display: grid;
   width: clamp(66px, 7vw, 94px);
+  height: clamp(66px, 7vw, 94px);
   aspect-ratio: 1;
   place-items: center;
   border: 2px solid var(--tool-border, rgba(255, 255, 255, 0.36));
-  border-radius: 22px;
+  border-radius: 50%;
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.14), transparent 46%),
     var(--tool-bg, #111111);
@@ -1798,9 +1799,9 @@ html[lang="ru"] .tools-core h2 {
   }
 
   .tools-orbit::before {
-    width: min(82vw, 330px);
-    height: min(64vh, 500px);
-    transform: translate(-50%, -50%) rotate(2deg);
+    width: min(78vw, 330px);
+    height: min(78vw, 330px);
+    transform: translate(-50%, -50%) rotate(0deg);
   }
 
   .tools-core {
@@ -1828,7 +1829,8 @@ html[lang="ru"] .tools-core h2 {
 
   .tool-icon {
     width: 58px;
-    border-radius: 17px;
+    height: 58px;
+    border-radius: 50%;
   }
 
   .tool-icon span {
@@ -1837,15 +1839,12 @@ html[lang="ru"] .tools-core h2 {
   }
 
   .about-section {
-    overflow: visible;
+    overflow: hidden;
   }
 
   .about-board {
-    display: flex;
-    min-height: auto;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
+    display: block;
+    min-height: clamp(780px, 118vh, 980px);
     padding: 84px 16px 72px;
   }
 
@@ -1854,7 +1853,8 @@ html[lang="ru"] .tools-core h2 {
   }
 
   .about-board-title {
-    position: static;
+    position: relative;
+    z-index: 10;
     width: 100%;
     margin: 0 0 0.35rem;
     transform: none;
@@ -1863,13 +1863,13 @@ html[lang="ru"] .tools-core h2 {
   }
 
   .drag-card {
-    position: relative;
-    left: auto;
-    top: auto;
-    transform: none !important;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    max-width: calc(100vw - 32px);
     border-radius: 28px;
-    cursor: default;
-    touch-action: auto;
+    cursor: grab;
+    touch-action: none;
   }
 
   .profile-drag-card {
